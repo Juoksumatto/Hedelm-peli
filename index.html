@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hedekmäpeli</title>
+    <link rel="stylesheet" href="tyyli.css">
+</head>
+<body>
+
+    <h1>Hedelmäpeli</h1>
+    <p>Rahaa: <span id="balance">50</span> €</p>
+    <p>Panos (1-25 €): <input type="number" id="bet" min="1" max="25" value="1"></p>
+    <div id="reels">
+      <div class="reel" data-index="0"></div>
+      <div class="reel" data-index="1"></div>
+      <div class="reel" data-index="2"></div>
+      <div class="reel" data-index="3"></div>
+    </div>
+    <br>
+    <button onclick="play()">Pelaa</button>
+    <div id="status"></div>
+  
+    <script>
+      const symbols = ['🍎', '🍐', '🍒', '🍉', '7️⃣'];
+      let balance = 50;
+      let locked = [false, false, false, false];
+      let reels = ['', '', '', ''];
+      let isSecondSpin = false;
+    document.querySelectorAll('.reel').forEach((el, i) => {
+      el.addEventListener('click', () => {
+        if (isSecondSpin) {
+        const lockedCount = locked.filter(val => val).length;
+        if (!locked[i] && lockedCount >= 2) {
+          alert("Voit lukita enintään 2 rullaa!");
+          return;
+        }
+        locked[i] = !locked[i];
+        el.classList.toggle('locked');
+        }
+      });
+    });
+  
+      function randomSymbol() {
+        return symbols[Math.floor(Math.random() * symbols.length)];
+      }
+  
+      function spinReels() {
+        for (let i = 0; i < 4; i++) {
+          if (!locked[i]) {
+            reels[i] = randomSymbol();
+          }
+          const reelEl = document.querySelector(`.reel[data-index="${i}"]`);
+          reelEl.textContent = reels[i];
+        }
+      }
+      function checkWin(bet) {
+        const counts = {};
+        reels.forEach(sym => counts[sym] = (counts[sym] || 0) + 1);
+  
+        let win = 0;
+        if (counts['7️⃣'] === 4) return bet * 10;
+        if (counts['🍎'] === 4) return bet * 6;
+        if (counts['🍉'] === 4) return bet * 5;
+        if (counts['🍐'] === 4) return bet * 4;
+        if (counts['🍒'] === 4) return bet * 3;
+        if (counts['7️⃣'] === 3) return bet * 5;
+  
+        return win;
+      }
+  
+function play() {
+  const bet = parseInt(document.getElementById("bet").value);
+  const status = document.getElementById("status");
+
+  if (!isSecondSpin && bet > balance) {
+    status.innerHTML = "Ei tarpeeksi rahaa!";
+    return;
+
+  }
+  if (bet < 1 || bet > 25) {
+    status.textContent = "Panoksen on oltava välillä 1-25 €!";
+    return;
+  }
+  if (!isSecondSpin) {
+    balance -= bet;
+    spinReels();
+    const win = checkWin(bet);
+    if (win > 0) {
+      balance += win;
+      status.textContent = `Voitit ${win} €!`;
+    } else {
+      status.textContent = "Valitse rullat jotka haluat lukita ja paina Pelaa uudelleen.";
+    }
+    isSecondSpin = true;
+  } else {
+    spinReels();
+    const win = checkWin(bet);
+    if (win > 0) {
+      balance += win;
+      status.textContent = `Voitit ${win} €!`;
+    } else {
+      status.textContent = "Ei voittoa.";
+    }
+    isSecondSpin = false;
+    locked = [false, false, false, false];
+    document.querySelectorAll('.reel').forEach(el => el.classList.remove('locked'));
+  }
+  document.getElementById("balance").textContent = balance;
+}
+
+
+    </script>
+</body>
+</html>
