@@ -3,4 +3,4 @@ body { font-family: Arial; text-align: center; padding: 20px; }
 .reel { font-size: 40px; margin: 10px; cursor: pointer; display: inline-block; width: 80px; height: 80px; line-height: 80px; border: 2px solid darkgreen; border-radius: 10px; }
 .locked { background-color: gray; }
 #status { margin-top: 20px; font-size: 18px; }
-p {color: green; font-size: 20px; font-weight: bold;}
+p { color: green; font-size: 20px; font-weight: bold;}
